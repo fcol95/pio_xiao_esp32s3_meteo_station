@@ -17,6 +17,8 @@
 #include "ui.h" //< For EEZ Studio functions
 #include "vars.h"
 
+#include "lcd_variables.h"
+
 static const char *LOG_TAG = "lcd";
 
 #define LVGL_LOCK_TIMEOUT_MS 1000U
@@ -39,26 +41,6 @@ static const char *LOG_TAG = "lcd";
 #define SSD1306_LCD_PARAM_BITS 8
 
 static lv_display_t *s_disp = NULL;
-
-// NOTE: Getter/Setter for EEZ Studio functions
-static int32_t           s_is_station_connected = 0;
-static SemaphoreHandle_t s_is_station_connected_mutex = NULL;
-
-int32_t get_var_is_station_connected()
-{
-    if (s_is_station_connected_mutex == NULL) return 0;
-    xSemaphoreTake(s_is_station_connected_mutex, portMAX_DELAY);
-    int32_t value = s_is_station_connected;
-    xSemaphoreGive(s_is_station_connected_mutex);
-    return value;
-}
-void set_var_is_station_connected(int32_t value)
-{
-    if (s_is_station_connected_mutex == NULL) return;
-    xSemaphoreTake(s_is_station_connected_mutex, portMAX_DELAY);
-    s_is_station_connected = value;
-    xSemaphoreGive(s_is_station_connected_mutex);
-}
 
 // LCD I2C Variables
 static i2c_master_bus_handle_t       s_i2c_bus = NULL;
@@ -94,7 +76,7 @@ static const esp_lcd_panel_dev_config_t s_panel_config = {
 
 static const lvgl_port_cfg_t s_lvgl_port_cfg = ESP_LVGL_PORT_INIT_CONFIG();
 
-esp_err_t lcd_init(void)
+esp_err_t lcd_manager_init(void)
 {
     ESP_LOGI(LOG_TAG, "Initialize I2C bus");
     ESP_ERROR_CHECK(i2c_new_master_bus(&s_i2c_bus_config, &s_i2c_bus));
@@ -140,9 +122,13 @@ esp_err_t lcd_init(void)
     /* Rotation of the screen */
     lv_display_set_rotation(s_disp, LV_DISPLAY_ROTATION_0);
 
-    // Init EEZ UI
-    s_is_station_connected_mutex = xSemaphoreCreateMutex();
-    if (s_is_station_connected_mutex == NULL) return ESP_FAIL;
+    // Init EEZ UI Variables
+    esp_err_t var_ret = lcd_variables_init();
+    if (var_ret == ESP_FAIL)
+    {
+        ESP_LOGE(LOG_TAG, "Failed to init EEZ variables handles!");
+        return ESP_FAIL;
+    }
 
     // Lock the mutex due to the LVGL APIs are not thread-safe
     if (!!!lvgl_port_lock(LVGL_LOCK_TIMEOUT_MS))
@@ -158,7 +144,7 @@ esp_err_t lcd_init(void)
     return ESP_OK;
 }
 
-void lcd_task(void *pvParameter)
+void lcd_manager_task(void *pvParameter)
 {
     // NOTE: This is the old example lvgl demo from espressif before integrating EEZ studio
     // example_lvgl_demo_ui(s_disp);

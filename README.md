@@ -1,12 +1,18 @@
-# Platformio XIAO ESP32S3 LCD SSD1306 LVGL Exploration
-This exploration project is to test the integration of esp_lvgl_port on the XIAO ESP32S3 connected to a Grove Expansion Board Base for XIAO and its SSD1306 LCD screen.
-Need at least to configure LVGL to use the FreeRTOS port. Run menuconfig -> Component config -> LVGL configuration -> Operating System (OS) -> Default operating system to use (2: FreeRTOS).
+# Platformio XIAO ESP32S3 Meteo Station Exploration
+This exploration project is to showcase the integration of a Bosch BME688 sensor with the Grove Expansion Board Base for XIAO and its SSD1306 LCD screen.
+The measured ambient paramters are displayed on the LCD screen continuously.
+For now, the "is station connected led" just blinking continously for the show case.
+
+Need at least to configure LVGL to use the FreeRTOS port and the proper fonts.
+Run menuconfig -> Component config -> LVGL configuration:
+1.  -> Operating System (OS) -> Default operating system to use (2: FreeRTOS).
+2.  -> Font Usage -> Enable built-in fonts -> MONTSERRAT_12, MONTSERRAT_14, and MONTSERRAT_20.
 Other menuconfig setups:
 1. 8MB Flash (XIAO ESP32S3 is 8MB, not 2MB).
 
 This project is also using EEZ Studio and framework to configure the UI and allow for state flow logic to be implemented in it.
-This is the example project made to demonstrate an example project configuring the display with a sample flow logic to toggle the corner "led" object:
-![EEZ Studio Project](doc/EEZ_Studio_Project.png.png)
+Here's an example of the LCD display in room ambient temperature:
+![ESP32S3 Meteo Station Display](doc/ESP32S3_Meteo_Station_Display.png)
 
 # Seeed Xiao ESP32-S3 references:
 https://docs.platformio.org/en/latest//boards/espressif32/seeed_xiao_esp32s3.html

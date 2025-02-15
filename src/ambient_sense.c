@@ -1,20 +1,27 @@
 #include "ambient_sense.h"
 
+#include "driver/i2c.h" //< For BME688 I2C communication port
 #include "esp_log.h"
 #include "esp_rom_sys.h" //< For BME688 delay_us port
-#include "driver/i2c.h"  //< For BME688 I2C communication port
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
 #include "bme68x.h"
 
+#include "lcd_variables.h"
+
+#define AMBIENT_SENSE_MEAS_LOOP_PERIOD_MS 250
+
 static const char *LOG_TAG = "ambient_sense";
 
-static esp_err_t i2c_master_init(void);
-static void bme68x_delay_us(uint32_t period, void *intf_ptr);
+static esp_err_t            i2c_master_init(void);
+static void                 bme68x_delay_us(uint32_t period, void *intf_ptr);
 static BME68X_INTF_RET_TYPE bme68x_i2c_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t length, void *intf_ptr);
-static BME68X_INTF_RET_TYPE bme68x_i2c_write(uint8_t reg_addr, const uint8_t *reg_data, uint32_t length, void *intf_ptr);
+static BME68X_INTF_RET_TYPE bme68x_i2c_write(uint8_t        reg_addr,
+                                             const uint8_t *reg_data,
+                                             uint32_t       length,
+                                             void          *intf_ptr);
 
 esp_err_t ambient_sense_init(void)
 {
@@ -31,16 +38,15 @@ void ambient_sense_task(void *pvParameter)
 {
     uint8_t i2c_address = 0x76; // Replace with your sensor's I2C address
 
-    struct bme68x_dev bme688_handle =
-        {
-            .intf = BME68X_I2C_INTF,
-            // Port Functions and Pointer
-            .intf_ptr = &i2c_address,
-            .delay_us = bme68x_delay_us,
-            .read = bme68x_i2c_read,
-            .write = bme68x_i2c_write,
-            .amb_temp = 25, // Ambient temperature in degrees Celsius
-        };
+    struct bme68x_dev bme688_handle = {
+        .intf = BME68X_I2C_INTF,
+        // Port Functions and Pointer
+        .intf_ptr = &i2c_address,
+        .delay_us = bme68x_delay_us,
+        .read = bme68x_i2c_read,
+        .write = bme68x_i2c_write,
+        .amb_temp = 25, // Ambient temperature in degrees Celsius
+    };
 
     int8_t ret = bme68x_init(&bme688_handle);
     if (ret != BME68X_OK)
@@ -54,17 +60,16 @@ void ambient_sense_task(void *pvParameter)
     }
 
     struct bme68x_data data;
-    uint8_t n_fields;
+    uint8_t            n_fields;
 
     // Set sensor configuration
-    struct bme68x_conf conf =
-        {
-            .os_hum = BME68X_OS_16X,
-            .os_pres = BME68X_OS_1X,
-            .os_temp = BME68X_OS_2X,
-            .filter = BME68X_FILTER_OFF,
-            .odr = BME68X_ODR_NONE,
-        };
+    struct bme68x_conf conf = {
+        .os_hum = BME68X_OS_16X,
+        .os_pres = BME68X_OS_1X,
+        .os_temp = BME68X_OS_2X,
+        .filter = BME68X_FILTER_OFF,
+        .odr = BME68X_ODR_NONE,
+    };
     ret = bme68x_set_conf(&conf, &bme688_handle);
     if (ret != BME68X_OK)
     {
@@ -77,12 +82,11 @@ void ambient_sense_task(void *pvParameter)
     }
 
     // Set heater configuration
-    struct bme68x_heatr_conf heatr_conf =
-        {
-            .enable = BME68X_DISABLE,
-            .heatr_temp = 320, // Target temperature in degree Celsius
-            .heatr_dur = 150,  // Duration in milliseconds
-        };
+    struct bme68x_heatr_conf heatr_conf = {
+        .enable = BME68X_DISABLE,
+        .heatr_temp = 320, // Target temperature in degree Celsius
+        .heatr_dur = 150,  // Duration in milliseconds
+    };
     ret = bme68x_set_heatr_conf(BME68X_FORCED_MODE, &heatr_conf, &bme688_handle);
     if (ret != BME68X_OK)
     {
@@ -111,7 +115,16 @@ void ambient_sense_task(void *pvParameter)
         ret = bme68x_get_data(BME68X_FORCED_MODE, &data, &n_fields, &bme688_handle);
         if (ret == BME68X_OK && n_fields > 0)
         {
-            ESP_LOGI(LOG_TAG, "Temperature: %.1f°C, Pressure: %.1fhPa, Humidity: %.1f%%, Gas Resistance: %.2fMOhms.", data.temperature, data.pressure / 100.0, data.humidity, data.gas_resistance / 1e6);
+            ESP_LOGI(LOG_TAG,
+                     "Temperature: %.1f°C, Pressure: %.1fhPa, Humidity: %.1f%%, Gas Resistance: %.2fMOhms.",
+                     data.temperature,
+                     data.pressure / 100.0,
+                     data.humidity,
+                     data.gas_resistance / 1e6);
+            set_var_amb_temp_degc(data.temperature);
+            set_var_is_amb_temp_negative(data.temperature < 0.0f);
+            set_var_amb_humid_pct(data.humidity);
+            set_var_amb_press_kpa(data.pressure / 1000.0);
         }
         else
         {
@@ -119,8 +132,8 @@ void ambient_sense_task(void *pvParameter)
             return;
         }
 
-        // Wait for 1 second before the next read
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        // Wait for before the next read
+        vTaskDelay(pdMS_TO_TICKS(AMBIENT_SENSE_MEAS_LOOP_PERIOD_MS));
     }
 }
 
