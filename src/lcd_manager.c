@@ -1,4 +1,4 @@
-#include "lcd.h"
+#include "lcd_manager.h"
 
 #include <stdio.h>
 
@@ -15,6 +15,7 @@
 
 #include "lvgl.h"
 #include "ui.h" //< For EEZ Studio functions
+#include "vars.h"
 
 static const char *LOG_TAG = "lcd";
 
@@ -40,23 +41,23 @@ static const char *LOG_TAG = "lcd";
 static lv_display_t *s_disp = NULL;
 
 // NOTE: Getter/Setter for EEZ Studio functions
-static int32_t           s_connected_led_state = 0;
-static SemaphoreHandle_t s_connected_led_state_mutex = NULL;
+static int32_t           s_is_station_connected = 0;
+static SemaphoreHandle_t s_is_station_connected_mutex = NULL;
 
-int32_t get_var_connected_led_state()
+int32_t get_var_is_station_connected()
 {
-    if (s_connected_led_state_mutex == NULL) return 0;
-    xSemaphoreTake(s_connected_led_state_mutex, portMAX_DELAY);
-    int32_t value = s_connected_led_state;
-    xSemaphoreGive(s_connected_led_state_mutex);
+    if (s_is_station_connected_mutex == NULL) return 0;
+    xSemaphoreTake(s_is_station_connected_mutex, portMAX_DELAY);
+    int32_t value = s_is_station_connected;
+    xSemaphoreGive(s_is_station_connected_mutex);
     return value;
 }
-void set_var_connected_led_state(int32_t value)
+void set_var_is_station_connected(int32_t value)
 {
-    if (s_connected_led_state_mutex == NULL) return;
-    xSemaphoreTake(s_connected_led_state_mutex, portMAX_DELAY);
-    s_connected_led_state = value;
-    xSemaphoreGive(s_connected_led_state_mutex);
+    if (s_is_station_connected_mutex == NULL) return;
+    xSemaphoreTake(s_is_station_connected_mutex, portMAX_DELAY);
+    s_is_station_connected = value;
+    xSemaphoreGive(s_is_station_connected_mutex);
 }
 
 // LCD I2C Variables
@@ -140,8 +141,8 @@ esp_err_t lcd_init(void)
     lv_display_set_rotation(s_disp, LV_DISPLAY_ROTATION_0);
 
     // Init EEZ UI
-    s_connected_led_state_mutex = xSemaphoreCreateMutex();
-    if (s_connected_led_state_mutex == NULL) return ESP_FAIL;
+    s_is_station_connected_mutex = xSemaphoreCreateMutex();
+    if (s_is_station_connected_mutex == NULL) return ESP_FAIL;
 
     // Lock the mutex due to the LVGL APIs are not thread-safe
     if (!!!lvgl_port_lock(LVGL_LOCK_TIMEOUT_MS))
@@ -180,8 +181,8 @@ void lcd_task(void *pvParameter)
         TickType_t        current_time = xTaskGetTickCount();
         if ((current_time - last_toggle_time) >= pdMS_TO_TICKS(1000))
         {
-            int32_t current_state = get_var_connected_led_state();
-            set_var_connected_led_state(!current_state);
+            int32_t current_state = get_var_is_station_connected();
+            set_var_is_station_connected(!current_state);
             last_toggle_time = current_time;
         }
         vTaskDelay(pdMS_TO_TICKS(UI_TASK_PERIOD_MS));

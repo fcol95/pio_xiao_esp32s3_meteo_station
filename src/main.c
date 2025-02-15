@@ -11,8 +11,8 @@
 #include "esp_flash.h"
 #include "esp_log.h"
 
-#include "lcd.h"
 #include "ambient_sense.h"
+#include "lcd_manager.h"
 
 static const char *LOG_TAG = "main";
 
@@ -80,13 +80,13 @@ void app_main()
 
     // Drivers Init
     esp_err_t ambient_sense_ret = ambient_sense_init();
-    esp_err_t lcd_ret = lcd_init();
+    esp_err_t lcd_ret = lcd_manager_init();
 
     // Tasks Init
     xTaskCreate(&blink_task, "blink_task", configMINIMAL_STACK_SIZE, NULL, 5, NULL);
     if (lcd_ret == ESP_OK)
     {
-        xTaskCreate(&lcd_task, "lcd_task", configMINIMAL_STACK_SIZE * 4, NULL, 4, NULL);
+        xTaskCreate(&lcd_manager_task, "lcd_task", configMINIMAL_STACK_SIZE * 4, NULL, 4, NULL);
     }
     else
     {

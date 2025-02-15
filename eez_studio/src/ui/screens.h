@@ -11,7 +11,13 @@ typedef struct _objects_t {
     lv_obj_t *main;
     lv_obj_t *obj0;
     lv_obj_t *connected_led;
-    lv_obj_t *obj1;
+    lv_obj_t *ambient_temperature;
+    lv_obj_t *degree_celsius;
+    lv_obj_t *ambient_humidity;
+    lv_obj_t *percent;
+    lv_obj_t *negative_temperature;
+    lv_obj_t *ambient_pressure;
+    lv_obj_t *percent_1;
 } objects_t;
 
 extern objects_t objects;
