@@ -133,8 +133,9 @@ void ambient_sense_task(void *pvParameter)
                      data.pressure / 100.0,
                      data.humidity,
                      data.gas_resistance / 1e6);
+            bool is_temperature_negative = (data.temperature < 0.0f);
             set_var_amb_temp_degc(data.temperature);
-            set_var_is_amb_temp_negative(data.temperature < 0.0f);
+            set_var_is_amb_temp_negative(is_temperature_negative);
             set_var_amb_humid_pct(data.humidity);
             set_var_amb_press_kpa(data.pressure / 1000.0);
         }

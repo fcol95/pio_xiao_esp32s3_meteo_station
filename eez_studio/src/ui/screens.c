@@ -64,7 +64,7 @@ void create_screen_main() {
                     lv_obj_set_style_text_opa(obj, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_text_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_text_font(obj, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
-                    lv_obj_set_style_max_width(obj, 45, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_max_width(obj, 37, LV_PART_MAIN | LV_STATE_DEFAULT);
                 }
                 {
                     // Degree Celsius
@@ -82,13 +82,13 @@ void create_screen_main() {
                     // Ambient Humidity
                     lv_obj_t *obj = lv_label_create(parent_obj);
                     objects.ambient_humidity = obj;
-                    lv_obj_set_pos(obj, 68, 11);
+                    lv_obj_set_pos(obj, 66, 11);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     lv_label_set_long_mode(obj, LV_LABEL_LONG_CLIP);
                     lv_label_set_text(obj, "");
                     lv_obj_set_style_text_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_text_opa(obj, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-                    lv_obj_set_style_max_width(obj, 35, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_max_width(obj, 31, LV_PART_MAIN | LV_STATE_DEFAULT);
                 }
                 {
                     // Percent
@@ -118,13 +118,13 @@ void create_screen_main() {
                     // Ambient Pressure
                     lv_obj_t *obj = lv_label_create(parent_obj);
                     objects.ambient_pressure = obj;
-                    lv_obj_set_pos(obj, 68, 36);
+                    lv_obj_set_pos(obj, 66, 36);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     lv_label_set_long_mode(obj, LV_LABEL_LONG_CLIP);
                     lv_label_set_text(obj, "");
                     lv_obj_set_style_text_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_text_opa(obj, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-                    lv_obj_set_style_max_width(obj, 35, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_max_width(obj, 31, LV_PART_MAIN | LV_STATE_DEFAULT);
                 }
                 {
                     // Percent_1
