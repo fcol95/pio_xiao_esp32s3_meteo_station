@@ -5,7 +5,6 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#include "driver/i2c_master.h"
 #include "esp_err.h"
 #include "esp_lcd_panel_io.h"
 #include "esp_lcd_panel_ops.h"
@@ -24,12 +23,8 @@ static const char *LOG_TAG = "lcd";
 #define LVGL_LOCK_TIMEOUT_MS 1000U
 #define UI_TASK_PERIOD_MS    10U
 
-#define I2C_BUS_PORT         0
-
 #define LCD_PIXEL_CLOCK_HZ   (400 * 1000)
-#define LCD_I2C_SDA_PIN_NUM  GPIO_NUM_5 // SDA pin for XIAO ESP32S3 with Grove Base Expansion Board LCD
-#define LCD_I2C_SCL_PIN_NUM  GPIO_NUM_6 // SCL pin for XIAO ESP32S3 with Grove Base Expansion Board LCD
-#define LCD_RESET_PIN_NUM    -1         // No LCD reset pin on XIAO Expansion Base Board -  -1 for unused
+#define LCD_RESET_PIN_NUM    -1 // No LCD reset pin on XIAO Expansion Base Board -  -1 for unused
 #define LCD_I2C_HW_ADDR      0x3C
 
 // The pixel number in horizontal and vertical
@@ -43,16 +38,6 @@ static const char *LOG_TAG = "lcd";
 static lv_display_t *s_disp = NULL;
 
 // LCD I2C Variables
-static i2c_master_bus_handle_t       s_i2c_bus = NULL;
-static const i2c_master_bus_config_t s_i2c_bus_config = {
-    .clk_source = I2C_CLK_SRC_DEFAULT,
-    .glitch_ignore_cnt = 7,
-    .i2c_port = I2C_BUS_PORT,
-    .sda_io_num = LCD_I2C_SDA_PIN_NUM,
-    .scl_io_num = LCD_I2C_SCL_PIN_NUM,
-    .flags.enable_internal_pullup = true,
-};
-
 static esp_lcd_panel_io_handle_t s_lcd_io_handle = NULL;
 
 static const esp_lcd_panel_io_i2c_config_t io_config = {
@@ -76,10 +61,8 @@ static const esp_lcd_panel_dev_config_t s_panel_config = {
 
 static const lvgl_port_cfg_t s_lvgl_port_cfg = ESP_LVGL_PORT_INIT_CONFIG();
 
-esp_err_t lcd_manager_init(void)
+esp_err_t lcd_manager_init(i2c_master_bus_handle_t s_i2c_bus)
 {
-    ESP_LOGI(LOG_TAG, "Initialize I2C bus");
-    ESP_ERROR_CHECK(i2c_new_master_bus(&s_i2c_bus_config, &s_i2c_bus));
     if (s_i2c_bus == NULL) return ESP_FAIL;
 
     ESP_LOGI(LOG_TAG, "Install panel IO");

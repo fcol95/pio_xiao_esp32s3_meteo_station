@@ -6,6 +6,7 @@
 #include "freertos/task.h"
 
 #include "driver/gpio.h" //< For LED toggling
+#include "driver/i2c_master.h"
 
 #include "esp_chip_info.h"
 #include "esp_flash.h"
@@ -21,6 +22,21 @@ static const char *LOG_TAG = "main";
 #else
     #define BLINK_GPIO (gpio_num_t)21 // LED_BUILT_IN
 #endif
+
+#define I2C_BUS_PORT    0
+
+#define I2C_SDA_PIN_NUM GPIO_NUM_5 // SDA pin for XIAO ESP32S3 with Grove Base Expansion Board
+#define I2C_SCL_PIN_NUM GPIO_NUM_6 // SCL pin for XIAO ESP32S3 with Grove Base Expansion Board
+
+static i2c_master_bus_handle_t       s_i2c_bus = NULL;
+static const i2c_master_bus_config_t s_i2c_bus_config = {
+    .clk_source = I2C_CLK_SRC_DEFAULT,
+    .glitch_ignore_cnt = 7,
+    .i2c_port = I2C_BUS_PORT,
+    .sda_io_num = I2C_SDA_PIN_NUM,
+    .scl_io_num = I2C_SCL_PIN_NUM,
+    .flags.enable_internal_pullup = true,
+};
 
 void blink_task(void *pvParameter)
 {
@@ -79,8 +95,11 @@ void app_main()
     ESP_LOGI(LOG_TAG, "Starting program...");
 
     // Drivers Init
-    esp_err_t ambient_sense_ret = ambient_sense_init();
-    esp_err_t lcd_ret = lcd_manager_init();
+    ESP_LOGI(LOG_TAG, "Initialize I2C bus");
+    ESP_ERROR_CHECK(i2c_new_master_bus(&s_i2c_bus_config, &s_i2c_bus));
+
+    esp_err_t ambient_sense_ret = ambient_sense_init(s_i2c_bus);
+    esp_err_t lcd_ret = lcd_manager_init(s_i2c_bus);
 
     // Tasks Init
     xTaskCreate(&blink_task, "blink_task", configMINIMAL_STACK_SIZE, NULL, 5, NULL);

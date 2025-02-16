@@ -220,8 +220,8 @@
                   "heightUnit": "px",
                   "children": [],
                   "widgetFlags": "CLICK_FOCUSABLE|GESTURE_BUBBLE|PRESS_LOCK|SCROLLABLE|SCROLL_CHAIN_HOR|SCROLL_CHAIN_VER|SCROLL_ELASTIC|SCROLL_MOMENTUM|SCROLL_WITH_ARROW|SNAPPABLE",
-                  "hiddenFlag": false,
-                  "hiddenFlagType": "literal",
+                  "hiddenFlag": "is_station_connected",
+                  "hiddenFlagType": "expression",
                   "clickableFlag": false,
                   "clickableFlagType": "literal",
                   "flagScrollbarMode": "",
@@ -279,7 +279,8 @@
                         "DEFAULT": {
                           "text_opa": 255,
                           "text_color": "#ffffff",
-                          "text_font": "MONTSERRAT_20"
+                          "text_font": "MONTSERRAT_20",
+                          "max_width": 45
                         }
                       }
                     }
@@ -382,7 +383,8 @@
                       "MAIN": {
                         "DEFAULT": {
                           "text_color": "#ffffff",
-                          "text_opa": 255
+                          "text_opa": 255,
+                          "max_width": 35
                         }
                       }
                     }
@@ -471,7 +473,8 @@
                   "heightUnit": "content",
                   "children": [],
                   "widgetFlags": "CLICK_FOCUSABLE|GESTURE_BUBBLE|PRESS_LOCK|SCROLLABLE|SCROLL_CHAIN_HOR|SCROLL_CHAIN_VER|SCROLL_ELASTIC|SCROLL_MOMENTUM|SCROLL_WITH_ARROW|SNAPPABLE",
-                  "hiddenFlagType": "literal",
+                  "hiddenFlag": "is_amb_temp_negative",
+                  "hiddenFlagType": "expression",
                   "clickableFlagType": "literal",
                   "flagScrollbarMode": "",
                   "flagScrollDirection": "",
@@ -538,7 +541,8 @@
                       "MAIN": {
                         "DEFAULT": {
                           "text_color": "#ffffff",
-                          "text_opa": 255
+                          "text_opa": 255,
+                          "max_width": 35
                         }
                       }
                     }
@@ -654,99 +658,9 @@
             "objID": "8eb86917-c831-b762-5685-8d01972e8a22"
           },
           "groupIndex": 0
-        },
-        {
-          "objID": "a9ca86a6-7edb-4249-8b1e-0f1509d85cc1",
-          "type": "IsTrueActionComponent",
-          "left": -82,
-          "top": -186,
-          "width": 212,
-          "height": 71,
-          "customInputs": [
-            {
-              "objID": "36f25f47-cf73-411e-97dc-1db68e203ccf",
-              "name": "value",
-              "type": "any"
-            }
-          ],
-          "customOutputs": [],
-          "value": "is_station_connected"
-        },
-        {
-          "objID": "f9d54753-b7ac-42d7-c3b3-ffc1b18f892a",
-          "type": "LVGLActionComponent",
-          "left": 154,
-          "top": -129,
-          "width": 237,
-          "height": 53,
-          "customInputs": [],
-          "customOutputs": [],
-          "actions": [
-            {
-              "objID": "5a49c61e-9f2a-4075-cd9b-1da374e3aa35",
-              "action": "objSetFlagHidden",
-              "object": "connected_led",
-              "objectType": "literal",
-              "hidden": true,
-              "hiddenType": "literal"
-            }
-          ]
-        },
-        {
-          "objID": "75991fb8-454a-4d42-a734-8bf62b6e6843",
-          "type": "LVGLActionComponent",
-          "left": 154,
-          "top": -213,
-          "width": 243,
-          "height": 53,
-          "customInputs": [],
-          "customOutputs": [],
-          "actions": [
-            {
-              "objID": "abff6288-7176-43af-d6c9-9d63ccc93612",
-              "action": "objSetFlagHidden",
-              "object": "connected_led",
-              "objectType": "literal",
-              "hidden": false,
-              "hiddenType": "literal"
-            }
-          ]
-        },
-        {
-          "objID": "893230bc-ea77-4864-8114-2b6a94cdfe0d",
-          "type": "WatchVariableActionComponent",
-          "left": -363,
-          "top": -186,
-          "width": 196,
-          "height": 53,
-          "customInputs": [],
-          "customOutputs": [],
-          "variable": "is_station_connected"
         }
       ],
-      "connectionLines": [
-        {
-          "objID": "1ce8696c-e9e6-4cea-9399-5da670422a68",
-          "source": "a9ca86a6-7edb-4249-8b1e-0f1509d85cc1",
-          "output": "True",
-          "target": "75991fb8-454a-4d42-a734-8bf62b6e6843",
-          "input": "@seqin"
-        },
-        {
-          "objID": "8a74560e-50e3-4055-9d0c-5d9bd8e7a775",
-          "source": "a9ca86a6-7edb-4249-8b1e-0f1509d85cc1",
-          "output": "False",
-          "target": "f9d54753-b7ac-42d7-c3b3-ffc1b18f892a",
-          "input": "@seqin"
-        },
-        {
-          "objID": "b3a3e112-3157-4a12-c2ef-12b5e7d42d9e",
-          "source": "893230bc-ea77-4864-8114-2b6a94cdfe0d",
-          "output": "variable",
-          "target": "a9ca86a6-7edb-4249-8b1e-0f1509d85cc1",
-          "input": "value"
-        }
-      ],
+      "connectionLines": [],
       "localVariables": [],
       "userProperties": [],
       "name": "Main",

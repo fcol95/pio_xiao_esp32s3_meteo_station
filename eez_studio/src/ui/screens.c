@@ -64,6 +64,7 @@ void create_screen_main() {
                     lv_obj_set_style_text_opa(obj, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_text_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_text_font(obj, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_max_width(obj, 45, LV_PART_MAIN | LV_STATE_DEFAULT);
                 }
                 {
                     // Degree Celsius
@@ -87,6 +88,7 @@ void create_screen_main() {
                     lv_label_set_text(obj, "");
                     lv_obj_set_style_text_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_text_opa(obj, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_max_width(obj, 35, LV_PART_MAIN | LV_STATE_DEFAULT);
                 }
                 {
                     // Percent
@@ -122,6 +124,7 @@ void create_screen_main() {
                     lv_label_set_text(obj, "");
                     lv_obj_set_style_text_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_text_opa(obj, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_max_width(obj, 35, LV_PART_MAIN | LV_STATE_DEFAULT);
                 }
                 {
                     // Percent_1
@@ -143,6 +146,16 @@ void create_screen_main() {
 void tick_screen_main() {
     void *flowState = getFlowState(0, 0);
     {
+        bool new_val = evalBooleanProperty(flowState, 2, 3, "Failed to evaluate Hidden flag");
+        bool cur_val = lv_obj_has_flag(objects.connected_led, LV_OBJ_FLAG_HIDDEN);
+        if (new_val != cur_val) {
+            tick_value_change_obj = objects.connected_led;
+            if (new_val) lv_obj_add_flag(objects.connected_led, LV_OBJ_FLAG_HIDDEN);
+            else lv_obj_clear_flag(objects.connected_led, LV_OBJ_FLAG_HIDDEN);
+            tick_value_change_obj = NULL;
+        }
+    }
+    {
         const char *new_val = evalTextProperty(flowState, 3, 3, "Failed to evaluate Text in Label widget");
         const char *cur_val = lv_label_get_text(objects.ambient_temperature);
         if (strcmp(new_val, cur_val) != 0) {
@@ -157,6 +170,16 @@ void tick_screen_main() {
         if (strcmp(new_val, cur_val) != 0) {
             tick_value_change_obj = objects.ambient_humidity;
             lv_label_set_text(objects.ambient_humidity, new_val);
+            tick_value_change_obj = NULL;
+        }
+    }
+    {
+        bool new_val = evalBooleanProperty(flowState, 7, 3, "Failed to evaluate Hidden flag");
+        bool cur_val = lv_obj_has_flag(objects.negative_temperature, LV_OBJ_FLAG_HIDDEN);
+        if (new_val != cur_val) {
+            tick_value_change_obj = objects.negative_temperature;
+            if (new_val) lv_obj_add_flag(objects.negative_temperature, LV_OBJ_FLAG_HIDDEN);
+            else lv_obj_clear_flag(objects.negative_temperature, LV_OBJ_FLAG_HIDDEN);
             tick_value_change_obj = NULL;
         }
     }
