@@ -12,6 +12,7 @@ Other menuconfig setups:
 
 This project is also using EEZ Studio and framework to configure the UI and allow for state flow logic to be implemented in it.
 Here's an example of the LCD display in room ambient temperature:
+
 ![ESP32S3 Meteo Station Display](doc/ESP32S3_Meteo_Station_Display.png)
 
 # Seeed Xiao ESP32-S3 references:
